@@ -4,10 +4,10 @@
 library(tidyr)
 library(dplyr)
 
-PATH = "/well/lindgren/UKBIOBANK/samvida/obesity_wrh/observational/"
+PATH = [redacted]
 
 ## Read and clean data ----
-data <- read.table(paste(PATH, "results/obesity_wrh_phenotypes_passed_qc_210720.txt", sep = ""), 
+data <- read.table(paste(PATH, "/results/obesity_wrh_phenotypes_passed_qc_210720.txt", sep = ""), 
                    sep = "\t", header = T)
 
 # Summarise demographic factors for each diagnosis group ----
@@ -59,7 +59,7 @@ res2 <- pivot_wider(res2[, c("diagnosis", "smoking_status",
 
 # Save results
 res <- merge(res, res2, by = "diagnosis")
-write.table(res, paste(PATH, "logs/summarised_phenotypes_210720.txt", sep = ""),
+write.table(res, paste(PATH, "/logs/summarised_phenotypes_210720.txt", sep = ""),
             sep = "\t", quote = F, row.names = F)
 
 # Prevalence of each diagnosis in BMI and WHR bins ----
@@ -89,5 +89,5 @@ plot_adiposity <- long_data %>% group_by(adiposity, adiposity_bin,
          lo_ci = mean - 1.96 * sd/sqrt(n))
 
 saveRDS(plot_adiposity, paste(PATH, 
-                                  "results/summarised_obesity_wrh_phenotypes_210720.rds",
+                                  "/results/summarised_obesity_wrh_phenotypes_210720.rds",
                                   sep = ""))
