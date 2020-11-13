@@ -1,6 +1,8 @@
 # Author: Samvida S. Venkatesh
 # Date: 23/06/20
 
+PATH = [redacted]
+
 ## Read data ----
 
 # Main phenotypes file from UKBB
@@ -11,7 +13,7 @@ colnames(pheno) <- gsub("X", "f.", colnames(pheno))
 colnames(pheno)[1] <- "f.eid"
 
 # IDs to keep that passed QC 
-passed_qc <- read.table("/well/lindgren/UKBIOBANK/samvida/obesity_wrh/observational/results/sample_ids_passed_qc_210720.txt",
+passed_qc <- read.table(paste(PATH, "/results/sample_ids_passed_qc_210720.txt", sep = ""),
                         header = T)
 colnames(passed_qc) <- "f.eid"
 
@@ -138,7 +140,7 @@ data <- cbind.data.frame(data, diagnoses_append)
 
 # Add cases from primary care data (that were previously calculated)
 
-primarycare_cases <- readRDS("/well/lindgren/UKBIOBANK/samvida/obesity_wrh/observational/results/ukbb_primarycare_wrh_outcomes.rds")
+primarycare_cases <- readRDS(paste(PATH, "/results/ukbb_primarycare_wrh_outcomes.rds", sep = ""))
 
 for (d in diagnoses) {
   # Update diagnosis column with primary care results
@@ -157,12 +159,12 @@ res <- data[, c("f.eid", "assessment_centre",
                 "age", "pregnant", "smoking_status", 
                 "BMI", "WHR", 
                 diagnoses)]
-write.table(res, "/well/lindgren/UKBIOBANK/samvida/obesity_wrh/observational/results/obesity_wrh_phenotypes_passed_qc_210720.txt",
+write.table(res, paste(PATH, "/results/obesity_wrh_phenotypes_passed_qc_210720.txt", sep = ""), 
             quote = F, row.names = F, sep = "\t")
 
 # Write summary table of number of cases for each phenotype
 summary <- colSums(res[, diagnoses])
-sink("/well/lindgren/UKBIOBANK/samvida/obesity_wrh/observational/logs/obesity_wrh_phenotypes_passed_qc_210720_summary")
+sink(paste(PATH, "/logs/obesity_wrh_phenotypes_passed_qc_210720_summary", sep = ""))
 cat(paste("Number of individuals: ", nrow(res), "\n", 
           "Number of cases: ", sep = ""))
 cat(paste(names(summary), summary, sep = "- "))
