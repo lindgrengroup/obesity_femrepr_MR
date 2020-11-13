@@ -2,6 +2,8 @@
 # Adapted from: Jenny Censin and Teresa Ferreira
 # Date: 17/06/2020
 
+PATH = [redacted]
+
 # Withdrawn consent ----
 
 remove_withdrawn <- function (data, qc_log_file) {
@@ -136,7 +138,7 @@ ukb_recommended_excl <- function (data, qc_log_file) {
 
 # Prepare data ----
 
-qc_log_file <- "/well/lindgren/UKBIOBANK/samvida/obesity_wrh/sample_qc_210720.txt"
+qc_log_file <- paste(PATH, "/qc/sample_qc_210720.txt", sep = "")
 
 # Phenotype file from UKBB
 pheno <- read.table("/well/lindgren/UKBIOBANK/DATA/PHENOTYPE/PHENOTYPE_MAIN/ukb10844.csv",
@@ -174,7 +176,7 @@ cleaned <- ukb_recommended_excl(cleaned, qc_log_file)
 # Output ----
 
 # Write file with passed sample IDs
-write.table(cleaned$f.eid, "/well/lindgren/UKBIOBANK/samvida/obesity_wrh/sample_ids_passed_qc_210720.txt", 
+write.table(cleaned$f.eid, paste(PATH, "/qc/sample_ids_passed_qc_210720.txt", sep = ""), 
             quote = F, row.names = F, sep = "\t")
 
 # Print sample characteristics after QC
