@@ -1,6 +1,8 @@
 # Author: Samvida S. Venkatesh
 # Date: 21/07/20
 
+PATH = [redacted]
+
 diagnoses <- c("endometriosis", "excessive_menstruation", "infertility",
                "miscarriage", "PCOS", "preeclampsia or eclampsia", 
                "uterine_fibroids")
@@ -39,9 +41,9 @@ names(icd9_codes) <- diagnoses
 
 # Convert ICD codes to read codes for primary care data (v3) ----
 
-v3_icd10_lkps <- read.table("resources/v3_icd10_lkps.txt", sep = "\t", header = T,
+v3_icd10_lkps <- read.table(paste(PATH, "/resources/v3_icd10_lkps.txt", sep = ""), sep = "\t", header = T,
                             stringsAsFactors = F)
-v3_icd9_lkps <- read.table("resources/v3_icd9_lkps.txt", sep = "\t", header = T,
+v3_icd9_lkps <- read.table(paste(PATH, "/resources/v3_icd9_lkps.txt", sep = ""), sep = "\t", header = T,
                            stringsAsFactors = F)
 
 v3_read_codes <- lapply(diagnoses, function (d) {
@@ -54,9 +56,9 @@ names(v3_read_codes) <- diagnoses
 
 # Convert ICD codes to read codes for primary care data (v2) ----
 
-v2_icd10_lkps <- read.table("resources/v2_icd10_lkps.txt", sep = "\t", header = T,
+v2_icd10_lkps <- read.table(paste(PATH, "/resources/v2_icd10_lkps.txt", sep = ""), sep = "\t", header = T,
                             stringsAsFactors = F)
-v2_icd9_lkps <- read.table("resources/v2_icd9_lkps.txt", sep = "\t", header = T,
+v2_icd9_lkps <- read.table(paste(PATH, "/resources/v2_icd9_lkps.txt", sep = ""), sep = "\t", header = T,
                            stringsAsFactors = F)
 
 v2_read_codes <- lapply(diagnoses, function (d) {
@@ -67,8 +69,8 @@ v2_read_codes <- lapply(diagnoses, function (d) {
 })
 names(v2_read_codes) <- diagnoses
 
-saveRDS(v3_read_codes, "resources/wrh_primarycare_read3_codes.rds")
-saveRDS(v2_read_codes, "resources/wrh_primarycare_read2_codes.rds")
+saveRDS(v3_read_codes, paste(PATH, "/resources/wrh_primarycare_read3_codes", sep = ""))
+saveRDS(v2_read_codes, paste(PATH, "/resources/wrh_primarycare_read2_codes", sep = ""))
 
 # Get f.eid and diagnosis ----
 
@@ -78,8 +80,8 @@ gp_clinical <- read.table("/well/lindgren/UKBIOBANK/DATA/PHENOTYPE/PRIMARY_CARE/
                           stringsAsFactors = F)
 
 # Get read codes
-v2_read_codes <- readRDS("resources/wrh_primarycare_read2_codes.rds")
-v3_read_codes <- readRDS("resources/wrh_primarycare_read3_codes.rds")
+v2_read_codes <- readRDS(paste(PATH, "/resources/wrh_primarycare_read3_codes", sep = ""))
+v3_read_codes <- readRDS(paste(PATH, "/resources/wrh_primarycare_read3_codes", sep = ""))
 
 diagnoses <- names(v2_read_codes)
 
@@ -100,4 +102,4 @@ wrh_patients <- lapply(diagnoses, function (d) {
   getDiagnosis(d)
 })
 
-saveRDS(wrh_patients, "results/ukbb_primarycare_wrh_outcomes.rds")
+saveRDS(wrh_patients, paste(PATH, "/results/ukbb_primarycare_wrh_outcomes.rds", sep = ""))
