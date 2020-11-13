@@ -3,10 +3,10 @@
 
 library(dplyr)
 
-PATH = "/well/lindgren/UKBIOBANK/samvida/obesity_wrh/observational/"
+PATH = [redacted]
 
 ## Read and clean data ----
-data <- read.table(paste(PATH, "results/obesity_wrh_phenotypes_passed_qc_210720.txt", sep = ""), 
+data <- read.table(paste(PATH, "/results/obesity_wrh_phenotypes_passed_qc_210720.txt", sep = ""), 
                    sep = "\t", header = T)
 
 # Adjust traits for covariates ----
@@ -109,5 +109,5 @@ all <- bind_rows(BMI_model_fits, WHR_model_fits, WHRadjBMI_model_fits)
 
 all$adj_pval <- p.adjust(all$pval, method = "fdr")
 
-write.table(all, paste(PATH, "results/logistic_regression_results_210720.txt", sep = ""),
+write.table(all, paste(PATH, "/results/logistic_regression_results_210720.txt", sep = ""),
             sep = "\t", quote = F, row.names = F)
