@@ -1,0 +1,34 @@
+# Author: Samvida S. Venkatesh
+# Date: 02/07/20
+
+library(TwoSampleMR)
+
+# Extract outcome information for all SNPs present in all instruments; 
+# then subset the dataset as needed for each MR
+
+exposures <- readRDS("/well/lindgren/samvida/obesity_wrh/twosampleMR/exposures/dfs_winner.rds")
+# Get list of SNPs to extract information for
+all_SNPs <- unique(exposures$SNP)
+
+## Read FinnGen data ----
+
+outcome_files <- list.files("/well/lindgren/samvida/obesity_wrh/twosampleMR/meta_outcomes", 
+                            pattern = "*.txt")
+outcome_names <- c("Endometriosis", "Excessive or frequent menstruation",
+                   "Infertility", "Miscarriage", "PCOS", 
+                   "Preeclampsia or eclampsia", "Uterine fibroids")
+
+outcomes <- lapply(1:length(outcome_files), function (i) {
+  # Read data in 2SMR format
+  df <- read_outcome_data(filename = paste("/well/lindgren/samvida/obesity_wrh/twosampleMR/meta_outcomes/", 
+                                           outcome_files[i], sep = ""),
+                          snps = all_SNPs, 
+                          sep = "\t", 
+                          snp_col = "MarkerName", beta_col = "beta", se_col = "se",
+                          effect_allele_col = "Allele1", other_allele_col = "Allele2",
+                          eaf_col = "Freq1", pval_col = "P.value")
+  df$outcome <- outcome_names[i]
+  return (df)
+})
+
+saveRDS(outcomes, "/well/lindgren/samvida/obesity_wrh/twosampleMR/meta_outcomes/meta_all_outcomes.rds")
