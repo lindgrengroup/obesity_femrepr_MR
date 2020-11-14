@@ -1,11 +1,15 @@
 # Author: Samvida S. Venkatesh
 # Date: 24/06/20
 
+PATH = [redacted]
+
 library(TwoSampleMR)
 library(tidyverse)
 
-exposures <- readRDS("Exposures/dfs_winner.rds")
-outcomes <- readRDS("Outcomes/meta_all_outcomes.rds")
+# Change these for each sensitivity analysis or as outcomes and 
+# exposures change
+exposures <- readRDS(paste(PATH, "/exposures/dfs_winner.rds", sep = ""))
+outcomes <- readRDS(paste(PATH, "/outcomes/meta_outcomes.rds", sep = ""))
 outcomes <- bind_rows(outcomes)
 
 # Harmonise data ----
@@ -65,5 +69,8 @@ all_MR <- merge(all_MR, wtmed[, c("outcome", "exposure", "or", "or_lci95", "or_u
 colnames(all_MR)[18:21] <- c("OR_weighted_median", "LCI_weighted_median", 
                              "UCI_weighted_median", "pval_weighted_median")
 
-write.table(all_MR, "Results/obesity_meta_wrh_mr_results_280720.txt", sep = "\t",
+write.table(all_MR, paste(PATH, 
+                          "/results/obesity_meta_wrh_mr_results_280720.txt", 
+                          sep = ""),
+            sep = "\t",
             quote = F, row.names = F)

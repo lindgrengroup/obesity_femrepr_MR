@@ -1,6 +1,8 @@
 # Author: Samvida S. Venkatesh
 # Date: 16/01/2020
 
+PATH = [redacted]
+
 # Load relevant packages
 library(tidyverse)     # for data manipulation
 library(TwoSampleMR)   # to perform two-sample MR
@@ -21,7 +23,7 @@ df_names <- paste(df_names, types, sep="")
 file_names <- paste(df_names, ".txt", sep="")
 
 # Read all the tables
-dfs <- lapply(file_names, function (x) read.table(paste("Exposures/", x, sep=""), 
+dfs <- lapply(file_names, function (x) read.table(paste(PATH, x, sep = ""), 
                                                   header = T, sep = " ",
                                                   stringsAsFactors = F))
 # Name dataframes with their respective titles for easy access
@@ -149,7 +151,8 @@ removedSNPs <- function (x1, x2) {
 }
 
 # Use sink to divert output from console to text file
-sink("Logs/obesity_instruments_removed_SNPs_240720.txt")
+sink(paste(PATH, "/logs/obesity_instruments_removed_SNPs_240720.txt", 
+           sep = ""))
 mapply(removedSNPs, x1 = dfs, x2 = dfs_clumped)
 sink()
 
@@ -169,7 +172,7 @@ mean_fstat <- lapply(dfs_clumped, calcFStatistic)
 dilution <- lapply(mean_fstat, function (x) 100/x )
 
 # Save F-stats and dilution percentages to file
-sink("exposures/f-stats.txt")
+sink(paste(PATH, "/obesity_fstats.txt", sep = ""))
 mean_fstat
 dilution
 sink()
@@ -190,8 +193,8 @@ dfs_winner <- mapply(cbind, dfs_winner, "gene.exposure" = NA,
 dfs_sensitivity <- mapply(cbind, dfs_clumped, "gene.exposure" = NA, SIMPLIFY = F)
 
 dfs_winner <- do.call(rbind, dfs_winner)
-saveRDS(dfs_winner, "exposures/dfs_winner.rds")
+saveRDS(dfs_winner, paste(PATH, "dfs_winner.rds", sep = ""))
 
 
 dfs_sensitivity <- do.call(rbind, dfs_sensitivity)
-saveRDS(dfs_sensitivity, "Exposures/dfs_sensitivity.rds")
+saveRDS(dfs_sensitivity, paste(PATH, "dfs_sensitivity.rds", sep = ""))

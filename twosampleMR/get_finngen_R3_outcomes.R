@@ -1,9 +1,11 @@
 # Author: Samvida S. Venkatesh
 # Date: 24/06/20
 
-library(TwoSampleMR, lib.loc = "/well/lindgren/samvida/R/lib")
+PATH = [redacted]
 
-outcome_files <- list.files("/well/lindgren/samvida/FINNGEN_R3")
+library(TwoSampleMR)
+
+outcome_files <- list.files(paste(PATH, "/finngen_r3", sep = ""))
 
 outcome_names <- c("Endometriosis", "Excessive or irregular menstruation", 
                    "Infertility", "Miscarriage", "PCOS", "Preeclampsia or eclampsia",
@@ -12,32 +14,31 @@ outcome_names <- c("Endometriosis", "Excessive or irregular menstruation",
 # Write data to format that can be read by 2SMR
 lapply(1:length(outcome_names), function (i) {
   
-  res <- read.table(paste("/well/lindgren/samvida/FINNGEN_R3/", outcome_files[i], 
+  res <- read.table(paste(PATH, "/finngen_r3/", outcome_files[i], 
                           sep = ""),
                     sep = "\t", header = T, comment.char = "?")
   res$phenotype <- outcome_names[i]
   
-  write.table(res, paste("/well/lindgren/samvida/obesity_wrh/twosampleMR/finngen_outcomes/", 
-                         outcome_files[i], ".txt", sep = ""), 
+  write.table(res, paste(PATH, "/finngen_r3/", outcome_files[i], 
+                         ".txt", sep = ""), 
               sep = "\t", row.names = F, quote = F)
 })
 
 # Extract outcome information for all SNPs present in all instruments; 
 # then subset the dataset as needed for each MR
 
-exposures <- readRDS("/well/lindgren/samvida/obesity_wrh/twosampleMR/exposures/dfs_winner.rds")
+exposures <- readRDS(paste(PATH, "/exposures/dfs_winner.rds", sep = ""))
 # Get list of SNPs to extract information for
 all_SNPs <- unique(exposures$SNP)
 
 ## Read FinnGen data ----
 
-outcome_files <- list.files("/well/lindgren/samvida/obesity_wrh/twosampleMR/finngen_outcomes", 
+outcome_files <- list.files(paste(PATH, "/finngen_r3", sep = ""), 
                             pattern = "finngen_r3_*")
   
 outcomes <- lapply(outcome_files, function (fname) {
   # Read data in 2SMR format
-  read_outcome_data(filename = paste("/well/lindgren/samvida/obesity_wrh/twosampleMR/finngen_outcomes/", 
-                                     fname, sep = ""),
+  read_outcome_data(filename = paste(PATH, "/finngen_r3/", fname, sep = ""),
                     snps = all_SNPs, 
                     sep = "\t", 
                     phenotype_col = "phenotype", 
@@ -46,4 +47,4 @@ outcomes <- lapply(outcome_files, function (fname) {
                     eaf_col = "maf", pval_col = "pval", gene_col = "nearest_genes")
 })
 
-saveRDS(outcomes, "/well/lindgren/samvida/obesity_wrh/twosampleMR/outcomes/finngen_r3_outcomes.rds")
+saveRDS(outcomes, paste(PATH, "/finngen_r3/finngen_r3_outcomes.rds", sep = ""))
