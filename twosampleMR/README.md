@@ -8,8 +8,8 @@ Scripts to be run in the following order -
 3. **get_meta_outcomes.R** - Get meta-analysis outcome results for SNPs in the relevant genetic instruments
 4. **obesity_wrh_MR.R** - Perform two-sample MR with constructed instruments and outcomes, including different MR methods and sensitivity tests
 
-For MR with waist circumference, hip circumference, waist-specific WHR, hip-specific WHR, and visceral fat mass instruments, replace step 2. above with:
-5. **construct_fat_instruments.R** - Construct genetic instruments for waist circumference, hip circumference (MRC-IEU database), waist- and hip-specific WHR (Lotta et al.), and predicted visceral fat mass (Karlsson et al.), and calculate instrument strength with F-statistics
+For MR with waist circumference, hip circumference, waist-specific WHR, hip-specific WHR, and visceral fat mass instruments, replace step 2. above with: 
+1. **construct_fat_instruments.R** - Construct genetic instruments for waist circumference, hip circumference (MRC-IEU database), waist- and hip-specific WHR (Lotta et al.), and predicted visceral fat mass (Karlsson et al.), and calculate instrument strength with F-statistics
 
-For sensitivity analyses with FinnGen-only outcomes, replace step 3. above with:
-6. **get_finngen_R3_outcomes.R** - Get only FinnGen GWAS results for SNPs in the relevant genetic instruments
+For sensitivity analyses with FinnGen-only outcomes, replace step 3. above with: 
+1. **get_finngen_R3_outcomes.R** - Get only FinnGen GWAS results for SNPs in the relevant genetic instruments
