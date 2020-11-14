@@ -1,6 +1,8 @@
 # Author: Samvida S. Venkatesh
 # Date: 16/01/2020
 
+PATH = [redacted]
+
 # Load relevant packages
 library(TwoSampleMR)   # to perform two-sample MR
 library(MRInstruments) # to get GWAS Catalog data for MR
@@ -57,11 +59,13 @@ dfs_fat <- bind_rows(all_dfs)
 
 # Construct waist-specific and hip-specific instruments from SNPs in Lotta et al. 2018
 
-waist <- read.table("Exposures/fat/waist_specific_whr.txt", sep = "\t", header = T,
+waist <- read.table(paste(PATH, "/exposures/fat/waist_specific_whr.txt", sep = ""), 
+                    sep = "\t", header = T,
                     stringsAsFactors = F)
 waist$Phenotype <- "Waist-specific WHR"
 waist$SE <- abs(waist$SE)
-hip <- read.table("Exposures/fat/hip_specific_whr.txt", sep = "\t", header = T, 
+hip <- read.table(paste(PATH, "/exposures/fat/hip_specific_whr.txt", sep = ""), 
+                  sep = "\t", header = T, 
                   stringsAsFactors = F)
 hip$Phenotype <- "Hip-specific WHR"
 hip$SE <- abs(hip$SE)
@@ -100,8 +104,8 @@ dfs_fat <- bind_rows(dfs_fat, jama_instruments)
 
 # Construct visceral fat instruments from SNPs in Karlsson et al.
 
-vfat <- read.table("Exposures/fat/vf_karlsson_2019.txt", sep = "\t", header = T,
-                    stringsAsFactors = F)[4:10]
+vfat <- read.table(paste(PATH, "/exposures/fat/vf_karlsson_2019.txt", sep = ""), 
+                   sep = "\t", header = T, stringsAsFactors = F)[4:10]
 
 calcFStatistic <- function(x) {
   # formula for F-statistic: 1/L * sum over all SNPs(beta.exp^2 / var.exp)
@@ -123,4 +127,4 @@ vfat$Phenotype <- "Visceral fat"
 
 dfs_fat <- bind_rows(dfs_fat, vfat)
 
-saveRDS(dfs_fat, "Exposures/fat/dfs_fat.rds")
+saveRDS(dfs_fat, paste(PATH, "/exposures/fat/dfs_fat.rds", sep = ""))
