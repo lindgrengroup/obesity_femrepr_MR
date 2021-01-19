@@ -13,9 +13,9 @@ data <- read.table(paste(PATH, "/results/obesity_wrh_phenotypes_passed_qc_210720
 
 # Remove extreme outliers: 
 # BMI <= 15 and BMI >= 60
-data <- data[data$BMI > 15 & data$BMI < 60, ]
-# WHR <= 0.6 and WHR >= 1.2
-data <- data[data$WHR > 0.6 & data$WHR < 1.2, ]
+# data <- data[data$BMI > 15 & data$BMI < 60, ]
+# # WHR <= 0.6 and WHR >= 1.2
+# data <- data[data$WHR > 0.6 & data$WHR < 1.2, ]
 
 # Make variable for age^2
 data$age_sq <- data$age^2
@@ -34,6 +34,23 @@ BMImodel <- glm(BMI ~ age + age_sq + assessment_centre + smoking_factor,
 data$adjBMI <- residuals(BMImodel)
 data$adjBMI <- qnorm((rank(data$adjBMI, na.last = "keep") - 0.5) / 
                        sum(!is.na(data$adjBMI)))
+
+# WC adjusted:
+WCmodel <- glm(wc ~ age + age_sq + assessment_centre + smoking_factor,
+                data = data,
+                na.action = na.exclude)
+data$adjWC <- residuals(WCmodel)
+data$adjWC <- qnorm((rank(data$adjWC, na.last = "keep") - 0.5) / 
+                       sum(!is.na(data$adjWC)))
+
+# HC adjusted:
+HCmodel <- glm(hc ~ age + age_sq + assessment_centre + smoking_factor,
+               data = data,
+               na.action = na.exclude)
+data$adjHC <- residuals(HCmodel)
+data$adjHC <- qnorm((rank(data$adjHC, na.last = "keep") - 0.5) / 
+                      sum(!is.na(data$adjHC)))
+
 
 # WHR adjusted:
 WHRmodel <- glm(WHR ~ age + age_sq + assessment_centre + smoking_factor,
@@ -73,6 +90,38 @@ BMI_model_fits <- lapply(diagnoses, function (d) {
 })
 BMI_model_fits <- bind_rows(BMI_model_fits)
 
+WC_model_fits <- lapply(diagnoses, function (d) {
+  m <- glm(formula = paste(d, " ~ adjWC", sep = ""),
+           data = data, 
+           na.action = na.exclude,
+           family = binomial(link = "logit"))
+  beta <- summary(m)$coefficients[, 1][2]
+  sd <- summary(m)$coefficients[, 2][2]
+  pval <- summary(m)$coefficients[, 4][2]
+  d <- data.frame(obesity_trait = "WC", diagnosis = d, 
+                  OR = exp(beta), 
+                  LCI = exp(beta) - 1.96*sd, UCI = exp(beta) + 1.96*sd,
+                  pval = pval)
+  return (d)
+})
+WC_model_fits <- bind_rows(WC_model_fits)
+
+HC_model_fits <- lapply(diagnoses, function (d) {
+  m <- glm(formula = paste(d, " ~ adjHC", sep = ""),
+           data = data, 
+           na.action = na.exclude,
+           family = binomial(link = "logit"))
+  beta <- summary(m)$coefficients[, 1][2]
+  sd <- summary(m)$coefficients[, 2][2]
+  pval <- summary(m)$coefficients[, 4][2]
+  d <- data.frame(obesity_trait = "HC", diagnosis = d, 
+                  OR = exp(beta), 
+                  LCI = exp(beta) - 1.96*sd, UCI = exp(beta) + 1.96*sd,
+                  pval = pval)
+  return (d)
+})
+HC_model_fits <- bind_rows(HC_model_fits)
+
 WHR_model_fits <- lapply(diagnoses, function (d) {
   m <- glm(formula = paste(d, " ~ adjWHR", sep = ""),
       data = data, 
@@ -105,7 +154,8 @@ WHRadjBMI_model_fits <- lapply(diagnoses, function (d) {
 })
 WHRadjBMI_model_fits <- bind_rows(WHRadjBMI_model_fits)
 
-all <- bind_rows(BMI_model_fits, WHR_model_fits, WHRadjBMI_model_fits)
+all <- bind_rows(BMI_model_fits, WHR_model_fits, WHRadjBMI_model_fits,
+                 WC_model_fits, HC_model_fits)
 
 all$adj_pval <- p.adjust(all$pval, method = "fdr")
 

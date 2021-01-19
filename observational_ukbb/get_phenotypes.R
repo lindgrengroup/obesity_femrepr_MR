@@ -157,7 +157,7 @@ data$miscarriage <- data$miscarriage | srm
 
 res <- data[, c("f.eid", "assessment_centre", 
                 "age", "pregnant", "smoking_status", 
-                "BMI", "WHR", 
+                "BMI", "WHR", "wc", "hc",
                 diagnoses)]
 write.table(res, paste(PATH, "/results/obesity_wrh_phenotypes_passed_qc_210720.txt", sep = ""), 
             quote = F, row.names = F, sep = "\t")
