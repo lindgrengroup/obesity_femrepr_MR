@@ -7,3 +7,4 @@ Scripts to be run in the following order -
 3. **get_phenotypes.R** - Collate traits and covariates of interest from UKBIOBANK phenotype file, including age, smoking status, BMI, waist circumference, hip circumference, ICD9 and ICD10 diagnoses, causes of death, self-reported non-cancer illness codes, and self-reported miscarriages
 4. **summarise_phenotypes.R** - Summarise demographic and anthropomorphic factors (age, BMI, WHR, etc.) in individuals with and without female reproductive disorders 
 5. **logit_regression.R** - Perform logistic regression for female reproductive disorders regressed on obesity traits, adjusting for appropriate covariates
+6. **nonlinear_models.R** - Perform nonlinear regressions with fractional polynomial models and GAMs for female reproductive disorders on obesity traits, adjusting for appropriate covariates
