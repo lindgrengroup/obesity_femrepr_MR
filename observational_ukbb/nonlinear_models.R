@@ -31,8 +31,8 @@ diagnoses <- c("endometriosis", "excessive_menstruation", "infertility",
 # Logistic regression models ----
 
 BMI_logit <- lapply(diagnoses, function (d) {
-  m <- bam(formula = paste(d, " ~ BMI + 
-        age + age_sq + assessment_centre + smoking_factor", sep = ""),
+  m <- bam(formula = formula(paste(d, " ~ BMI + 
+        age + age_sq + assessment_centre + smoking_factor", sep = "")),
            data = data, 
            na.action = na.exclude,
            family = binomial(link = "logit"))
@@ -41,8 +41,8 @@ BMI_logit <- lapply(diagnoses, function (d) {
 names(BMI_logit) <- diagnoses
 
 WHR_logit <- lapply(diagnoses, function (d) {
-  m <- bam(formula = paste(d, " ~ WHR + 
-        age + age_sq + assessment_centre + smoking_factor", sep = ""),
+  m <- bam(formula = formula(paste(d, " ~ WHR + 
+        age + age_sq + assessment_centre + smoking_factor", sep = "")),
            data = data, 
            na.action = na.exclude,
            family = binomial(link = "logit"))
@@ -51,8 +51,8 @@ WHR_logit <- lapply(diagnoses, function (d) {
 names(WHR_logit) <- diagnoses
 
 WHRadjBMI_logit <- lapply(diagnoses, function (d) {
-  m <- bam(formula = paste(d, " ~ WHRadjBMI + 
-        age + age_sq + assessment_centre + smoking_factor", sep = ""),
+  m <- bam(formula = formula(paste(d, " ~ WHRadjBMI + 
+        age + age_sq + assessment_centre + smoking_factor", sep = "")),
            data = data, 
            na.action = na.exclude,
            family = binomial(link = "logit"))
@@ -63,8 +63,8 @@ names(WHRadjBMI_logit) <- diagnoses
 # Fractional polynomial models ----
 
 BMI_fp <- lapply(diagnoses, function (d) {
-  m <- mfp(formula = paste(d, " ~ BMI + 
-        age + age_sq + assessment_centre + smoking_factor", sep = ""),
+  m <- mfp(formula = formula(paste(d, " ~ BMI + 
+        age + age_sq + assessment_centre + smoking_factor", sep = "")),
            family = binomial(link = "logit"),
            data = data)
   return (m)
@@ -72,8 +72,8 @@ BMI_fp <- lapply(diagnoses, function (d) {
 names(BMI_fp) <- diagnoses
 
 WHR_fp <- lapply(diagnoses, function (d) {
-  m <- mfp(formula = paste(d, " ~ WHR + 
-        age + age_sq + assessment_centre + smoking_factor", sep = ""),
+  m <- mfp(formula = formula(paste(d, " ~ WHR + 
+        age + age_sq + assessment_centre + smoking_factor", sep = "")),
            family = binomial(link = "logit"),
            data = data)
   return (m)
@@ -81,8 +81,8 @@ WHR_fp <- lapply(diagnoses, function (d) {
 names(WHR_fp) <- diagnoses
 
 WHRadjBMI_fp <- lapply(diagnoses, function (d) {
-  m <- mfp(formula = paste(d, " ~ WHRadjBMI + 
-        age + age_sq + assessment_centre + smoking_factor", sep = ""),
+  m <- mfp(formula = formula(paste(d, " ~ WHRadjBMI + 
+        age + age_sq + assessment_centre + smoking_factor", sep = "")),
            family = binomial(link = "logit"),
            data = data)
   return (m)
@@ -102,8 +102,8 @@ saveRDS(fp_models, "results/fracpoly_models.rds")
 # Generalised additive models ----
 
 BMI_gam <- lapply(diagnoses, function (d) {
-  m <- bam(formula = paste(d, " ~ s(BMI) + 
-        age + age_sq + assessment_centre + smoking_factor", sep = ""),
+  m <- bam(formula = formula(paste(d, " ~ s(BMI) + 
+        age + age_sq + assessment_centre + smoking_factor", sep = "")),
            data = data, 
            na.action = na.exclude,
            family = binomial(link = "logit"))
@@ -112,8 +112,8 @@ BMI_gam <- lapply(diagnoses, function (d) {
 names(BMI_gam) <- diagnoses
 
 WHR_gam <- lapply(diagnoses, function (d) {
-  m <- bam(formula = paste(d, " ~ s(WHR) + 
-        age + age_sq + assessment_centre + smoking_factor", sep = ""),
+  m <- bam(formula = formula(paste(d, " ~ s(WHR) + 
+        age + age_sq + assessment_centre + smoking_factor", sep = "")),
            data = data, 
            na.action = na.exclude,
            family = binomial(link = "logit"))
@@ -122,8 +122,8 @@ WHR_gam <- lapply(diagnoses, function (d) {
 names(WHR_gam) <- diagnoses
 
 WHRadjBMI_gam <- lapply(diagnoses, function (d) {
-  m <- bam(formula = paste(d, " ~ s(WHRadjBMI) + 
-        age + age_sq + assessment_centre + smoking_factor", sep = ""),
+  m <- bam(formula = formula(paste(d, " ~ s(WHRadjBMI) + 
+        age + age_sq + assessment_centre + smoking_factor", sep = "")),
            data = data, 
            na.action = na.exclude,
            family = binomial(link = "logit"))
@@ -167,10 +167,10 @@ testWHRpred <- data.frame(WHR = seq(0.6, 1.2, length.out = 1000),
                           assessment_centre = getMode(data$assessment_centre),
                           smoking_factor = getMode(data$smoking_factor))
 testWHRadjBMIpred <- data.frame(WHRadjBMI = seq(-4.5, 4.5, length.out = 1000), 
-                          age = mean(data$age, na.rm = T),
-                          age_sq = mean(data$age_sq, na.rm = T),
-                          assessment_centre = getMode(data$assessment_centre),
-                          smoking_factor = getMode(data$smoking_factor))
+                                age = mean(data$age, na.rm = T),
+                                age_sq = mean(data$age_sq, na.rm = T),
+                                assessment_centre = getMode(data$assessment_centre),
+                                smoking_factor = getMode(data$smoking_factor))
 
 # Predict
 
