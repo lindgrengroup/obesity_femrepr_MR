@@ -1,8 +1,12 @@
+# Author: Samvida S. Venkatesh
+# Date: 20/01/2021
+
 library(mfp)
 library(splines)
 library(mgcv)
 library(tidyverse)
 theme_set(theme_bw())
+library(paletteer)
 
 # Read and add data ----
 
@@ -30,117 +34,152 @@ diagnoses <- c("endometriosis", "excessive_menstruation", "infertility",
 
 # Logistic regression models ----
 
+sink("logs/BMI_logit.txt")
 BMI_logit <- lapply(diagnoses, function (d) {
   m <- bam(formula = formula(paste(d, " ~ BMI + 
         age + age_sq + assessment_centre + smoking_factor", sep = "")),
            data = data, 
            na.action = na.exclude,
-           family = binomial(link = "logit"))
+           family = binomial(link = "logit"),
+           method = "ML")
+  print(d)
+  print(summary(m))
   return (m)
 })
+sink()
 names(BMI_logit) <- diagnoses
 
+sink("logs/WHR_logit.txt")
 WHR_logit <- lapply(diagnoses, function (d) {
   m <- bam(formula = formula(paste(d, " ~ WHR + 
         age + age_sq + assessment_centre + smoking_factor", sep = "")),
            data = data, 
            na.action = na.exclude,
-           family = binomial(link = "logit"))
+           family = binomial(link = "logit"),
+           method = "ML")
+  print(d)
+  print(summary(m))
   return (m)
 })
+sink()
 names(WHR_logit) <- diagnoses
 
+sink("logs/WHRadjBMI_logit.txt")
 WHRadjBMI_logit <- lapply(diagnoses, function (d) {
   m <- bam(formula = formula(paste(d, " ~ WHRadjBMI + 
         age + age_sq + assessment_centre + smoking_factor", sep = "")),
            data = data, 
            na.action = na.exclude,
-           family = binomial(link = "logit"))
+           family = binomial(link = "logit"),
+           method = "ML")
+  print(d)
+  print(summary(m))
   return (m)
 })
+sink()
 names(WHRadjBMI_logit) <- diagnoses
 
 # Fractional polynomial models ----
 
+sink("logs/BMI_fp.txt")
 BMI_fp <- lapply(diagnoses, function (d) {
-  m <- mfp(formula = formula(paste(d, " ~ BMI + 
+  m <- mfp(formula = formula(paste(d, " ~ fp(BMI) + 
         age + age_sq + assessment_centre + smoking_factor", sep = "")),
            family = binomial(link = "logit"),
            data = data)
+  print(d)
+  print(summary(m))
   return (m)
 })
+sink()
 names(BMI_fp) <- diagnoses
 
+sink("logs/WHR_fp.txt")
 WHR_fp <- lapply(diagnoses, function (d) {
-  m <- mfp(formula = formula(paste(d, " ~ WHR + 
+  m <- mfp(formula = formula(paste(d, " ~ fp(WHR) + 
         age + age_sq + assessment_centre + smoking_factor", sep = "")),
            family = binomial(link = "logit"),
            data = data)
+  print(d)
+  print(summary(m))
   return (m)
 })
+sink()
 names(WHR_fp) <- diagnoses
 
+sink("logs/WHRadjBMI_fp.txt")
 WHRadjBMI_fp <- lapply(diagnoses, function (d) {
-  m <- mfp(formula = formula(paste(d, " ~ WHRadjBMI + 
+  m <- mfp(formula = formula(paste(d, " ~ fp(WHRadjBMI) + 
         age + age_sq + assessment_centre + smoking_factor", sep = "")),
            family = binomial(link = "logit"),
            data = data)
+  print(d)
+  print(summary(m))
   return (m)
 })
+sink()
 names(WHRadjBMI_fp) <- diagnoses
-
-fp_models <- lapply(diagnoses, function (d) {
-  BMI <- summary(BMI_fp[[d]])
-  WHR <- summary(WHR_fp[[d]])
-  WHRadjBMI <- summary(WHRadjBMI_fp[[d]])
-  return (list(BMI = BMI, WHR = WHR, WHRadjBMI = WHRadjBMI))
-})
-names(fp_models) <- diagnoses
-
-saveRDS(fp_models, "results/fracpoly_models.rds")
 
 # Generalised additive models ----
 
+sink("logs/BMI_GAM.txt")
 BMI_gam <- lapply(diagnoses, function (d) {
   m <- bam(formula = formula(paste(d, " ~ s(BMI) + 
         age + age_sq + assessment_centre + smoking_factor", sep = "")),
            data = data, 
            na.action = na.exclude,
-           family = binomial(link = "logit"))
+           family = binomial(link = "logit"),
+           method = "ML")
+  print(d)
+  print(summary(m))
   return (m)
 })
+sink()
 names(BMI_gam) <- diagnoses
 
+sink("logs/WHR_GAM.txt")
 WHR_gam <- lapply(diagnoses, function (d) {
   m <- bam(formula = formula(paste(d, " ~ s(WHR) + 
         age + age_sq + assessment_centre + smoking_factor", sep = "")),
            data = data, 
            na.action = na.exclude,
-           family = binomial(link = "logit"))
+           family = binomial(link = "logit"),
+           method = "ML")
+  print(d)
+  print(summary(m))
   return (m)
 })
+sink()
 names(WHR_gam) <- diagnoses
 
+sink("logs/WHRadjBMI_GAM.txt")
 WHRadjBMI_gam <- lapply(diagnoses, function (d) {
   m <- bam(formula = formula(paste(d, " ~ s(WHRadjBMI) + 
         age + age_sq + assessment_centre + smoking_factor", sep = "")),
            data = data, 
            na.action = na.exclude,
-           family = binomial(link = "logit"))
+           family = binomial(link = "logit"),
+           method = "ML")
+  print(d)
+  print(summary(m))
   return (m)
 })
+sink()
 names(WHRadjBMI_gam) <- diagnoses
 
 # Test GAM model fits vs logistic ----
 
+sink("logs/GAM_vs_logit_AIC.txt")
 gam_vs_logit <- lapply(diagnoses, function (d) {
-  BMI <- anova(BMI_logit[[d]], BMI_gam[[d]], test = "Chisq")
-  WHR <- anova(WHR_logit[[d]], WHR_gam[[d]], test = "Chisq")
-  WHRadjBMI <- anova(WHRadjBMI_logit[[d]], WHRadjBMI_gam[[d]], test = "Chisq")
-  return (list(BMI = BMI, WHR = WHR, WHRadjBMI = WHRadjBMI))
+  print("BMI")
+  AIC(BMI_logit[[d]], BMI_gam[[d]])
+  print("WHR")
+  AIC(WHR_logit[[d]], WHR_gam[[d]])
+  print("WHRadjBMI")
+  AIC(WHRadjBMI_logit[[d]], WHRadjBMI_gam[[d]])
+  return ()
 })
-
-saveRDS(gam_vs_logit, "results/GAM_vs_logit.rds")
+sink()
 
 # Compute model predictions ----
 
@@ -263,3 +302,39 @@ names(WHRadjBMI_preds) <- diagnoses
 
 preds <- list(BMI = BMI_preds, WHR = WHR_preds, WHRadjBMI = WHRadjBMI_preds)
 saveRDS(preds, "results/nonlinear_model_predictions.rds")
+
+# Plot predictions ----
+
+plots <- lapply(diagnoses, function (d) {
+  # Combine the BMI, WHR, WHRadjBMI data for a single plot per disorder
+  BMI <- preds$BMI[[d]]
+  BMI$obesity_trait <- "BMI"
+  colnames(BMI)[1] <- "obesity_value"
+  
+  WHR <- preds$WHR[[d]]
+  WHR$obesity_trait <- "WHR"
+  colnames(WHR)[1] <- "obesity_value"
+  
+  WHRadjBMI <- preds$WHRadjBMI[[d]]
+  WHRadjBMI$obesity_trait <- "WHRadjBMI"
+  colnames(WHRadjBMI)[1] <- "obesity_value"
+  
+  dat <- bind_rows(BMI, WHR, WHRadjBMI)
+  
+  p <- ggplot(dat, aes(x = obesity_value, 
+                       y = fit, color = fit_class, fill = fit_class)) +
+    facet_wrap(~obesity_trait, nrow = 1, scales = "free_x") +
+    geom_ribbon(aes(ymin = lower, ymax = upper), alpha = 0.2) +
+    geom_line() +
+    scale_color_paletteer_d("ggsci::default_aaas") +
+    scale_fill_paletteer_d("ggsci::default_aaas") +
+    labs(x = "Obesity value", y = "Predicted probability of disease", 
+         title = d)
+  
+  return (p)
+})
+
+pdf("figures/nonlinear_model_predictions.pdf", onefile = T)
+plots
+dev.off()
+
