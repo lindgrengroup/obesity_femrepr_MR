@@ -165,6 +165,11 @@ bmi_data$cluster <- factor(bmi_data$cluster,
                                    "PCOS_1", "Preeclampsia or eclampsia_1"))
 # Order by cluster 
 bmi_data <- bmi_data[order(bmi_data$cluster), ] 
+# Keep unique SNPs and add an asterisk if SNP repeated
+SNP_count <- bmi_data %>% group_by(genename) %>% mutate(n = n())
+bmi_data$genename <- ifelse(SNP_count$n > 1, paste0(SNP_count$genename, "*"),
+                        SNP_count$genename)
+bmi_data <- bmi_data %>% distinct(genename, .keep_all = T)
 bmi_annot <- data.frame(cluster = bmi_data$cluster)
 annot_gaps <- cumsum(table(bmi_annot$cluster))
 plot <- bmi_data[, 4:11]
@@ -175,6 +180,7 @@ tiff(paste(PATH, "/figures/mrclust_bmi_clusters.tiff", sep = ""),
 pheatmap(plot, 
          cluster_rows = F, cluster_cols = F,
          scale = "none", treeheight_col = 0,
+         color = colorRampPalette(c("#3B4992FF", "#FFFFFF", "#EE0000FF"))(50),
          labels_row = bmi_data$genename,
          fontsize = 6,
          show_colnames = F,
@@ -190,6 +196,11 @@ whr_data$cluster <- factor(whr_data$cluster,
                                       "Preeclampsia or eclampsia_1"))
 # Order by cluster 
 whr_data <- whr_data[order(whr_data$cluster), ] 
+# Keep unique SNPs and add an asterisk if SNP repeated
+SNP_count <- whr_data %>% group_by(genename) %>% mutate(n = n())
+whr_data$genename <- ifelse(SNP_count$n > 1, paste0(SNP_count$genename, "*"),
+                            SNP_count$genename)
+whr_data <- whr_data %>% distinct(genename, .keep_all = T)
 whr_annot <- data.frame(cluster = whr_data$cluster)
 annot_gaps <- cumsum(table(whr_annot$cluster))
 plot <- whr_data[, 4:11]
@@ -200,6 +211,7 @@ tiff(paste(PATH, "/figures/mrclust_whr_clusters.tiff", sep = ""),
 pheatmap(plot, 
          cluster_rows = F, cluster_cols = F,
          scale = "none", treeheight_col = 0,
+         color = colorRampPalette(c("#3B4992FF", "#FFFFFF", "#EE0000FF"))(50),
          labels_row = whr_data$genename,
          fontsize = 8,
          show_colnames = F,
@@ -216,6 +228,11 @@ whradjbmi_data$cluster <- factor(whradjbmi_data$cluster,
                                       "Preeclampsia or eclampsia_1"))
 # Order by cluster 
 whradjbmi_data <- whradjbmi_data[order(whradjbmi_data$cluster), ] 
+# Keep unique SNPs and add an asterisk if SNP repeated
+SNP_count <- whradjbmi_data %>% group_by(genename) %>% mutate(n = n())
+whradjbmi_data$genename <- ifelse(SNP_count$n > 1, paste0(SNP_count$genename, "*"),
+                            SNP_count$genename)
+whradjbmi_data <- whradjbmi_data %>% distinct(genename, .keep_all = T)
 whradjbmi_annot <- data.frame(cluster = whradjbmi_data$cluster)
 annot_gaps <- cumsum(table(whradjbmi_data$cluster))
 plot <- whradjbmi_data[, 4:11]
@@ -226,6 +243,7 @@ tiff(paste(PATH, "/figures/mrclust_whradjbmi_clusters.tiff", sep = ""),
 pheatmap(plot, 
          cluster_rows = F, cluster_cols = F,
          scale = "none", treeheight_col = 0,
+         color = colorRampPalette(c("#3B4992FF", "#FFFFFF", "#EE0000FF"))(50),
          labels_row = whradjbmi_data$genename,
          fontsize = 8,
          show_colnames = F,
