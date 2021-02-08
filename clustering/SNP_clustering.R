@@ -249,3 +249,36 @@ pheatmap(plot,
          show_colnames = F,
          gaps_col = 1:7, gaps_row = annot_gaps)
 dev.off()
+
+# Supplementary figure - upset plots ----
+
+snps$exposure <- lapply(strsplit(snps$relationship, "[x]"), function (x) x[1])
+snps$exposure <- factor(as.character(snps$exposure))
+snps$outcome <- lapply(strsplit(snps$relationship, "[x]"), function (x) x[2])
+snps$outcome <- factor(as.character(snps$outcome))
+
+bmi_snps <- subset(snps, snps$exposure == "bmi ")
+bmi_snps <- split(bmi_snps[, "observation"], bmi_snps$outcome)
+bmi_snps <- lapply(bmi_snps, function (x) as.character(x$observation) )
+tiff("figures/mrclust_bmi_overlaps.tiff", units = "cm",
+     height = 10, width = 15, res = 800)
+upset(fromList(bmi_snps), order.by = "freq")
+dev.off()
+
+whr_snps <- subset(snps, snps$exposure == "whr ")
+whr_snps <- split(whr_snps[, "observation"], whr_snps$outcome)
+whr_snps <- lapply(whr_snps, function (x) as.character(x$observation) )
+tiff("figures/mrclust_whr_overlaps.tiff", units = "cm",
+     height = 10, width = 15, res = 800)
+upset(fromList(whr_snps), order.by = "freq")
+dev.off()
+
+whradjbmi_snps <- subset(snps, snps$exposure == "whradjbmi ")
+whradjbmi_snps <- split(whradjbmi_snps[, "observation"], whradjbmi_snps$outcome)
+whradjbmi_snps <- lapply(whradjbmi_snps, function (x) as.character(x$observation) )
+tiff("figures/mrclust_whradjbmi_overlaps.tiff", units = "cm",
+     height = 10, width = 15, res = 800)
+upset(fromList(whradjbmi_snps), order.by = "freq")
+dev.off()
+
+
