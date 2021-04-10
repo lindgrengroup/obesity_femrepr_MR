@@ -2,14 +2,12 @@
 # Adapted from: Jenny Censin and Teresa Ferreira
 # Date: 07/07/20
 
-PATH = [redacted]
-
 # Withdrawn consent ----
 
 remove_withdrawn <- function (data, qc_log_file) {
   
   #Path to UKBB provided list of individuals that have withdrawn consent
-  withdrawn <- read.table("/well/lindgren/UKBIOBANK/DATA/QC/w11867_20200204.csv", 
+  withdrawn <- read.table("/well/lindgren/UKBIOBANK/DATA/QC/w11867_20210201.csv", 
                           header = F)
   
   cleaned <- subset(data, !(data$f.eid %in% withdrawn$V1))
@@ -81,7 +79,7 @@ keep_white_british_ancestry <- function (data, qc_log_file) {
   sink(qc_log_file, append = T)
   cat(paste("**FILTER** EXCLUDED, Not in white British ancestry subset: ",
             length(which(data$in.white.British.ancestry.subset != 1)), "\n",
-            "REMAINING, Self-reported white: ",
+            "REMAINING, White British ancestry: ",
             nrow(cleaned), "\n", sep = ""))
   sink()
   
@@ -137,33 +135,74 @@ qc_sex_chr_aneupl  <- function(data, qc_log_file) {
 
 # Relatedness ----
 
-qc_ukbb_related <- function(data, qc_log_file) { 
-  
-  cleaned <- subset(data, data$in.kinship.table == 0)	
-  
+qc_excess_related <- function(data, qc_log_file) {
+
+  cleaned <- subset(data, !is.na(data$excess.relatives) &
+                      data$excess.relatives != 1)
+
   sink(qc_log_file, append = T)
-  cat(paste("**FILTER** EXCLUDED, in UKB kinship table: ", 
-            length(which(data$in.kinship.table != 0)), "\n",
-            "REMAINING not related: ", nrow(cleaned), "\n", sep = "")) 
+  cat(paste("**FILTER** EXCLUDED, excess relatives (>10 3rd degree relatives): ",
+            nrow(data) - nrow(cleaned),
+            "; REMAINING: ", nrow(cleaned), "\n", sep = ""))
   sink()
-  
+
   return(cleaned)
-  
+
+}
+
+qc_related <- function(data, qc_log_file) {
+
+  # Pathway to UKBB list of related individuals
+  related <- read.table("/well/lindgren/UKBIOBANK/DATA/QC/ukb1186_rel_s488366.dat",
+                        header = T)
+
+  # For each pair of related individuals
+  # remove the samples with the highest missingness
+  related <- related[related$Kinship > 0.0884 &
+                       related$ID1 %in% data$f.eid & related$ID2 %in% data$f.eid, ]
+
+  related$miss1 = data$sample.qc.missing.rate[match(related$ID1, data$f.eid)]
+  related$miss2 = data$sample.qc.missing.rate[match(related$ID2, data$f.eid)]
+  related$max_miss <- pmax(related$miss1, related$miss2)
+
+  # Remove according to rule above
+  related$id_remove <- ifelse(is.na(related$miss1) & is.na(related$miss2),
+                              related$ID2,
+                              ifelse(is.na(related$miss1), related$ID1,
+                                     ifelse(is.na(related$miss2), related$ID2,
+                                            ifelse(related$miss1 ==
+                                                     related$max_miss, related$ID1,
+                                                   ifelse(related$miss2 ==
+                                                            related$max_miss,
+                                                          related$ID2, "error")))))
+
+  cleaned <- subset(data, !(data$f.eid %in% related$id_remove))
+
+  sink(qc_log_file, append = T)
+  cat(paste("**FILTER** Relatedness pairs with errors: ",
+            length(which(related$id_remove == "error")), "\n",
+            "**FILTER** Individuals excluded because of relatedness: ",
+            nrow(data[data$f.eid %in% related$id_remove, ]), "\n",
+            "REMAINING NOT RELATED: ", nrow(cleaned), "\n\n", sep = ""))
+  sink()
+
+  return(cleaned)
+
 }
 
 qc_kinship_table <- function(data, qc_log_file) {
-  
-  cleaned <- subset(data, !is.na(data$excluded.from.kinship.inference) & 
+
+  cleaned <- subset(data, !is.na(data$excluded.from.kinship.inference) &
                       data$excluded.from.kinship.inference == 0)
-  
+
   sink(qc_log_file, append = T)
-  cat(paste("**FILTER** Excluded from kinship inference: ", 
-            nrow(data) - nrow(cleaned), 
+  cat(paste("**FILTER** Excluded from kinship inference: ",
+            nrow(data) - nrow(cleaned),
             " ; REMAINING: ", nrow(cleaned), "\n", sep = ""))
   sink()
-  
+
   return(cleaned)
-  
+
 }
 
 # Other exclusions ----
@@ -189,7 +228,7 @@ ukb_recommended_excl <- function (data, qc_log_file) {
 
 # Prepare data ----
 
-qc_log_file <- paste(PATH, "/sample_qc_070720.txt", sep = "")
+qc_log_file <- "/well/lindgren/UKBIOBANK/samvida/obesity_wrh/nonlinearMR/logs/sample_qc_090421.txt"
 
 # Phenotype file from UKBB
 pheno <- read.table("/well/lindgren/UKBIOBANK/DATA/PHENOTYPE/PHENOTYPE_MAIN/ukb10844.csv",
@@ -249,6 +288,9 @@ sink()
 
 # Run QC ----
 
+# Only keep genotyped individuals
+cleaned <- subset(pheno, !is.na(pheno$f.22001.0.0))
+
 # Withdrawn
 cleaned <- remove_withdrawn(pheno, qc_log_file)
 cleaned <- remove_negative_ids(cleaned, qc_log_file)
@@ -266,7 +308,8 @@ cleaned <- qc_not_in_phasing(cleaned, qc_log_file)
 cleaned <- qc_sex_chr_aneupl(cleaned, qc_log_file)
 
 # Relatedness
-cleaned <- qc_ukbb_related(cleaned, qc_log_file)
+cleaned <- qc_excess_related(cleaned, qc_log_file)
+cleaned <- qc_related(cleaned, qc_log_file)
 cleaned <- qc_kinship_table(cleaned, qc_log_file)
 
 # Other
@@ -275,19 +318,6 @@ cleaned <- ukb_recommended_excl(cleaned, qc_log_file)
 # Output ----
 
 # Write file with passed sample IDs
-write.table(cleaned$f.eid, paste(PATH, "/sample_ids_passed_qc_180620.txt", 
-                                 sep = ""), 
+write.table(cleaned$f.eid, 
+            "/well/lindgren/UKBIOBANK/samvida/obesity_wrh/nonlinearMR/results/sample_ids_passed_qc_090421.txt", 
             quote = F, row.names = F, sep = "\t")
-
-# Print sample characteristics before QC
-sink(qc_log_file, append = T)
-cat(paste("TOTAL SAMPLE SIZE: ", nrow(cleaned), "\n", sep = ""))
-cat(paste("   MEN: ", length(which(cleaned$f.31.0.0 == 1)), "\n", sep = ""))
-cat(paste("   WOMEN ", length(which(cleaned$f.31.0.0 == 0)), "\n", sep = ""))
-cat(paste("   GENOTYPED ", length(which(!is.na(cleaned$f.22001.0.0))), "\n", sep = ""))
-cat(paste("     MEN ", length(which(!is.na(cleaned$f.22001.0.0) & 
-                                      cleaned$f.31.0.0 == 1)), "\n", sep = ""))
-cat(paste("     WOMEN ", length(which(!is.na(cleaned$f.22001.0.0) & 
-                                        cleaned$f.31.0.0 == 0)) , "\n", sep = ""))
-
-sink()
