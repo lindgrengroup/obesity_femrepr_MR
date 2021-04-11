@@ -288,16 +288,16 @@ sink()
 
 # Run QC ----
 
-# Only keep genotyped individuals
+# Only keep genotyped females
 cleaned <- subset(pheno, !is.na(pheno$f.22001.0.0))
+cleaned <- keep_only_females(cleaned, qc_log_file)
 
 # Withdrawn
-cleaned <- remove_withdrawn(pheno, qc_log_file)
+cleaned <- remove_withdrawn(cleaned, qc_log_file)
 cleaned <- remove_negative_ids(cleaned, qc_log_file)
 
 # Sex
 cleaned <- qc_sex_mismatch(cleaned, qc_log_file)
-cleaned <- keep_only_females(cleaned, qc_log_file)
 
 # Ethnicity
 cleaned <- keep_white_british_ancestry(cleaned, qc_log_file)
