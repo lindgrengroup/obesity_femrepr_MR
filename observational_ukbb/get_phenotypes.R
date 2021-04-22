@@ -1,8 +1,6 @@
 # Author: Samvida S. Venkatesh
 # Date: 23/06/20
 
-PATH = [redacted]
-
 ## Read data ----
 
 # Main phenotypes file from UKBB
@@ -13,7 +11,7 @@ colnames(pheno) <- gsub("X", "f.", colnames(pheno))
 colnames(pheno)[1] <- "f.eid"
 
 # IDs to keep that passed QC 
-passed_qc <- read.table(paste(PATH, "/results/sample_ids_passed_qc_210720.txt", sep = ""),
+passed_qc <- read.table("/well/lindgren/UKBIOBANK/samvida/obesity_wrh/observational/results/sample_ids_passed_qc_210720.txt",
                         header = T)
 colnames(passed_qc) <- "f.eid"
 
@@ -28,6 +26,7 @@ data <- pheno[pheno$f.eid %in% passed_qc$f.eid, ]
 # f.21003.0.0 - age
 # f.3140.0.0 - pregnant (0 - No, 1 - Yes, 2 - Unsure)
 # f.20116.0.0 - smoking status (0 - Never, 1 - Previous, 2 - Current, -3 - Prefer not to answer)
+# f.2724.0.0 - had menopause
 # f.21001.0.0 - BMI
 # f.48.0.0 - waist circumference
 # f.49.0.0 - hip circumference
@@ -50,13 +49,13 @@ non_cancer_illness_cols <- colnames(data)[grep("^f.20002.", colnames(data))]
 self_reported_miscarr <- colnames(data)[grep("^f.2774.", colnames(data))]
 
 cols_to_extract <- c("f.eid", "f.54.0.0", 
-                     "f.21003.0.0", "f.3140.0.0", "f.20116.0.0", 
+                     "f.21003.0.0", "f.3140.0.0", "f.20116.0.0", "f.2724.0.0",
                      "f.21001.0.0", "f.48.0.0", "f.49.0.0", 
                      ICD10_cols, ICD9_cols, non_cancer_illness_cols, 
                      self_reported_miscarr)
 data <- data[, cols_to_extract]
 colnames(data) <- c("f.eid", "assessment_centre", 
-                    "age", "pregnant", "smoking_status", 
+                    "age", "pregnant", "smoking_status", "menopause_status",
                     "BMI", "wc", "hc", 
                     ICD10_cols, ICD9_cols, non_cancer_illness_cols, 
                     self_reported_miscarr)
@@ -112,8 +111,8 @@ pre_or_eclampsia_nci <- "1073"
 uterine_fibroids_nci <- c("1351", "1352")
 
 nci_codes <- list(endometriosis_nci, exc_mens_nci, infertility_nci, 
-                   miscarriage_nci, PCOS_nci,
-                   pre_or_eclampsia_nci, uterine_fibroids_nci)
+                  miscarriage_nci, PCOS_nci,
+                  pre_or_eclampsia_nci, uterine_fibroids_nci)
 names(nci_codes) <- diagnoses
 
 # Bring all codes together ----
@@ -140,7 +139,7 @@ data <- cbind.data.frame(data, diagnoses_append)
 
 # Add cases from primary care data (that were previously calculated)
 
-primarycare_cases <- readRDS(paste(PATH, "/results/ukbb_primarycare_wrh_outcomes.rds", sep = ""))
+primarycare_cases <- readRDS("/well/lindgren/UKBIOBANK/samvida/obesity_wrh/observational/results/ukbb_primarycare_wrh_outcomes.rds")
 
 for (d in diagnoses) {
   # Update diagnosis column with primary care results
@@ -156,15 +155,15 @@ data$miscarriage <- data$miscarriage | srm
 # Create results data frame ----
 
 res <- data[, c("f.eid", "assessment_centre", 
-                "age", "pregnant", "smoking_status", 
-                "BMI", "WHR", "wc", "hc",
+                "age", "pregnant", "smoking_status", "menopause_status",
+                "BMI", "WHR", 
                 diagnoses)]
-write.table(res, paste(PATH, "/results/obesity_wrh_phenotypes_passed_qc_210720.txt", sep = ""), 
+write.table(res, "/well/lindgren/UKBIOBANK/samvida/obesity_wrh/observational/results/obesity_wrh_phenotypes_passed_qc_220421.txt",
             quote = F, row.names = F, sep = "\t")
 
 # Write summary table of number of cases for each phenotype
 summary <- colSums(res[, diagnoses])
-sink(paste(PATH, "/logs/obesity_wrh_phenotypes_passed_qc_210720_summary", sep = ""))
+sink("/well/lindgren/UKBIOBANK/samvida/obesity_wrh/observational/logs/obesity_wrh_phenotypes_passed_qc_220421_summary")
 cat(paste("Number of individuals: ", nrow(res), "\n", 
           "Number of cases: ", sep = ""))
 cat(paste(names(summary), summary, sep = "- "))
