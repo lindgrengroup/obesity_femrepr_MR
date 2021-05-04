@@ -78,19 +78,29 @@ diagnoses <- c("endometriosis", "excessive_menstruation", "infertility",
                "miscarriage", "PCOS", "preeclampsia.or.eclampsia", 
                "uterine_fibroids")
 
-traits <- c("BMI", "WHR", "WHRadjBMI")
-
-pl_5 <- lapply(diagnoses, function (outcome) {
+fp_bmi <- lapply(diagnoses, function (outcome) {
   y <- as.numeric(data[, outcome])
-  models <- lapply(traits, function (exposure) {
-    x <- data[, exposure]
-    g <- data[, paste(exposure, "GRS", sep = "_")]
-    return (tryCatch(piecewise_mr(y, x, g, covs, 
+  x <- data$BMI
+  g <- data$BMI_GRS
+  
+  return (tryCatch(fracpoly_mr(y, x, g, covs, 
+                               family = "binomial", q = 100, d = "both", 
+                               ci = "model_se", fig = T),
+                   error = function (e) NULL))
+})
+
+names(fp_bmi) <- diagnoses
+
+saveRDS(fp_bmi, "results/fracpoly.rds")
+
+pl_10 <- lapply(diagnoses, function (outcome) {
+  y <- as.numeric(data[, outcome])
+  x <- data$BMI
+  g <- data$BMI_GRS
+  return (tryCatch(piecewise_mr(y, x, g, covs, 
                          family = "binomial", q = 5,
                          fig = T),
                      error = function (e) NULL))
-  })
-  return (models)
 })
 
-saveRDS(pl_5, paste(PATH, "/results/piecewise_q5.rds", sep = ""))
+saveRDS(pl_10, paste(PATH, "/results/piecewise_q10.rds", sep = ""))
