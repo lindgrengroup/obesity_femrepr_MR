@@ -39,11 +39,15 @@ summ <- snp_effects %>% group_by(exposure, outcome) %>%
 
 # UMAP for clustering ----
 
-d <- snp_effects
-d$SNP_exp <- paste(d$SNP, d$exposure, sep = "_")
-d <- d[, -c(1,2)]
+# UMAP for each trait ----
+
+# Replace with BMI, WHR, or WHRadjBMI as appropriate
+trait <- "bmi"
+
+d <- subset(snp_effects, snp_effects$exposure == trait)
+d <- d[, c("SNP", "outcome", "b")]
 d <- d %>% group_by(outcome) %>% 
-   pivot_wider(names_from = SNP_exp, values_from = b)
+   pivot_wider(names_from = SNP, values_from = b)
 d[is.na(d)] <- 0
 
 d <- data.frame(d, stringsAsFactors = F)
@@ -65,8 +69,10 @@ ggplot(df, aes(x, y, label = Disease)) +
    geom_point(size = 3, color = "#c91d59") +
    geom_text(aes(label = Disease), vjust = -0.5, hjust = 1)
 
-tiff(paste(PATH, "/figures/umap.tiff", sep = ""), 
-     width = 7, height = 7, units = "cm", res = 800)
+tiff("figures/umap_bmi.tiff", width = 7, height = 7, units = "cm", res = 800)
 ggplot(df, aes(x, y, label = Disease)) +
-   geom_point(color = "#c91d59")
+   geom_point(color = "#c91d59") +
+   geom_hline(yintercept = 0, linetype = "dashed") +
+   geom_vline(xintercept = 0, linetype = "dashed") +
+   theme(axis.title = element_blank())
 dev.off()
