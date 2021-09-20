@@ -30,6 +30,7 @@ data <- pheno[pheno$f.eid %in% passed_qc$f.eid, ]
 # f.21001.0.0 - BMI
 # f.48.0.0 - waist circumference
 # f.49.0.0 - hip circumference
+# f.1687.0.0 - comparative body size at age 10
 # f.41202.x.x - main ICD10 diagnosis
 # f.41204.x.x - secondary ICD10 diagnosis
 # f.40001.x.x - underlying (primary) cause of death ICD10
@@ -50,13 +51,13 @@ self_reported_miscarr <- colnames(data)[grep("^f.2774.", colnames(data))]
 
 cols_to_extract <- c("f.eid", "f.54.0.0", 
                      "f.21003.0.0", "f.3140.0.0", "f.20116.0.0", "f.2724.0.0",
-                     "f.21001.0.0", "f.48.0.0", "f.49.0.0", 
+                     "f.21001.0.0", "f.48.0.0", "f.49.0.0", "f.1687.0.0",
                      ICD10_cols, ICD9_cols, non_cancer_illness_cols, 
                      self_reported_miscarr)
 data <- data[, cols_to_extract]
 colnames(data) <- c("f.eid", "assessment_centre", 
                     "age", "pregnant", "smoking_status", "menopause_status",
-                    "BMI", "wc", "hc", 
+                    "BMI", "wc", "hc", "body_size_10",
                     ICD10_cols, ICD9_cols, non_cancer_illness_cols, 
                     self_reported_miscarr)
 
@@ -111,8 +112,8 @@ pre_or_eclampsia_nci <- "1073"
 uterine_fibroids_nci <- c("1351", "1352")
 
 nci_codes <- list(endometriosis_nci, exc_mens_nci, infertility_nci, 
-                  miscarriage_nci, PCOS_nci,
-                  pre_or_eclampsia_nci, uterine_fibroids_nci)
+                   miscarriage_nci, PCOS_nci,
+                   pre_or_eclampsia_nci, uterine_fibroids_nci)
 names(nci_codes) <- diagnoses
 
 # Bring all codes together ----
@@ -156,9 +157,9 @@ data$miscarriage <- data$miscarriage | srm
 
 res <- data[, c("f.eid", "assessment_centre", 
                 "age", "pregnant", "smoking_status", "menopause_status",
-                "BMI", "WHR", 
+                "BMI", "WHR", "body_size_10",
                 diagnoses)]
-write.table(res, "/well/lindgren/UKBIOBANK/samvida/obesity_wrh/observational/results/obesity_wrh_phenotypes_passed_qc_220421.txt",
+write.table(res, "/well/lindgren/UKBIOBANK/samvida/obesity_wrh/observational/results/obesity_wrh_phenotypes_passed_qc_200921.txt",
             quote = F, row.names = F, sep = "\t")
 
 # Write summary table of number of cases for each phenotype
