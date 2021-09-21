@@ -13,3 +13,6 @@ For MR with waist circumference, hip circumference, waist-specific WHR, hip-spec
 
 For sensitivity analyses with FinnGen-only outcomes, replace step 3. above with: 
 1. **get_finngen_R3_outcomes.R** - Get only FinnGen GWAS results for SNPs in the relevant genetic instruments
+
+For sensitivity analyses with multivariable MR for WHR and BMI SNPs in the same model, as compared to WHRadjBMI SNPs - 
+1. **Scripts in /whradjbmi_mvmr/** - Scripts to construct instrument with joint exposures, and script to run multivariable MR
