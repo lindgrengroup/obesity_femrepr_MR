@@ -50,6 +50,6 @@ PROCESS Resources/Endometriosis_Zondervan/annotated_sumstats.txt
 
 # === ANALYSE FILES ===
 OUTFILE meta_endometriosis_ .tbl
-ANALYZE 
+ANALYZE HETEROGENEITY
 
 QUIT
