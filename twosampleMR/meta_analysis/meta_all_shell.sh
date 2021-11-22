@@ -29,11 +29,8 @@ echo "Started at: "`date`
 echo "------------------------------------------------"
 
 /apps/well/metal/20110325/metal < ./meta_endometriosis_script.txt
-/apps/well/metal/20110325/metal < ./meta_excmens_script.txt
 /apps/well/metal/20110325/metal < ./meta_infertility_script.txt
-/apps/well/metal/20110325/metal < ./meta_miscarriage_script.txt
-/apps/well/metal/20110325/metal < ./meta_pcos_script.txt
-/apps/well/metal/20110325/metal < ./meta_pre_or_eclamps_script.txt
+apps/well/metal/20110325/metal < ./meta_pre_or_eclamps_script.txt
 /apps/well/metal/20110325/metal < ./meta_uf_script.txt
 
 echo "###########################################################"
