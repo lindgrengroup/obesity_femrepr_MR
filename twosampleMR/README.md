@@ -1,6 +1,6 @@
 ## Two-sample Mendelian Randomisation to estimate causal effects of obesity traits on female reproductive disorders using publically available GWAS summary statistics
 
-### Files:
+### Scripts:
 
 Scripts to be run in the following order - 
 1. **Scripts in /meta_analysis/** - METAL files to specify inverse-variance weighted fixed effects meta-analysis of UKBIOBANK and FinnGen summary statistics; instructions are specified in *.txt files, and executed from **meta_all_shell.sh**
@@ -16,3 +16,7 @@ For sensitivity analyses with FinnGen-only outcomes, replace step 3. above with:
 
 For sensitivity analyses with multivariable MR for WHR and BMI SNPs in the same model, as compared to WHRadjBMI SNPs - 
 1. **Scripts in /whradjbmi_mvmr/** - Scripts to construct instrument with joint exposures, and script to run multivariable MR
+
+### Data:
+
+Harmonised datasets (i.e. alleles aligned across exposures and outcomes) for **main analyses** deposited in /harmonised_datasets/. Main analysis exposures are BMI, WHR, WHRadjBMI (female-specific instruments with female-specific weights, from GIANT-UKB meta-analysis reported by Pulit et al. 2019); other exposures as detailed above. Main analysis outcomes are meta-anlysed across FinnGen, UKB, and/or other largest available European-ancestry GWAS as described in the manuscript S2 Table.  
