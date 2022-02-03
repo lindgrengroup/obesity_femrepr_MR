@@ -1,8 +1,8 @@
 # The role of obesity in female reproductive conditions: A Mendelian Randomisation Study
-Code for analyses in manuscript here - https://www.medrxiv.org/content/10.1101/2021.06.01.21257781v1
+Code for analyses in article here - https://doi.org/10.1371/journal.pmed.1003679
 
 ## Cite as: 
-The role of obesity in female reproductive conditions: A Mendelian Randomisation Study. Samvida S. Venkatesh, Teresa Ferreira, Stefania Benonisdottir, Nilufer Rahmioglu, Christian M. Becker, Ingrid Granne, Krina T. Zondervan, Michael V. Holmes, Cecilia M. Lindgren, Laura B. L. Wittemans. medRxiv 2021.06.01.21257781; doi: https://doi.org/10.1101/2021.06.01.21257781
+Venkatesh SS, Ferreira T, Benonisdottir S, Rahmioglu N, Becker CM, Granne I, Zondervan KT, Holmes MV, Lindgren CM, Wittemans LBL. Obesity and risk of female reproductive conditions: A Mendelian randomisation study. PLoS Med. 2022 Feb 1;19(2):e1003679. doi: 10.1371/journal.pmed.1003679. PMID: 35104295; PMCID: PMC8806071.
 
 ## Structure
 Folders correspond to relevant analysis sections in the manuscript, separate folder with scripts to generate figures. 
