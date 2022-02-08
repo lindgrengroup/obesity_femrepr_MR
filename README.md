@@ -1,4 +1,4 @@
-# The role of obesity in female reproductive conditions: A Mendelian Randomisation Study
+# Obesity and risk of female reproductive conditions: A Mendelian randomisation study.
 Code for analyses in article here - https://doi.org/10.1371/journal.pmed.1003679
 
 ## Cite as: 
